@@ -98,6 +98,56 @@
 ;(palindrome? "Racecar")
 
 
+;;;;;;;;;;;;;;;;;;;;
+;; Balanced Brackets
+
+(comment
+
+  (defn balanced?
+  "Given a string, determine whether or not
+  the brackets within it are balanced"
+  [s]
+  (empty? (reduce (fn [stack item]
+            (cond
+              ;; if the current item is an open bracket, add it to the stack
+              ((set "({[") item) (conj stack item)
+
+              ;; check that the last item in the stack is an open bracket
+              ;; and that the current item closes the last item
+              ;; then pop the stack
+              (and ((set "({[") (last stack))
+                   (= ({\) \(, \] \[, \} \{} item) (last stack))) (pop stack)
+
+              ;; yolo
+              :else (conj stack item)))
+          []
+          (filter #{\[ \] \{ \} \( \)} s))))
+
+)
+
+(def open-bracket (set "[{("))
+
+(def close-bracket {\] \[,
+                    \} \{,
+                    \) \(})
+
+(defn balanced? [s]
+  (->> s
+       (filter #{\[ \] \{ \} \( \)})
+
+       (reduce (fn [stack item]
+                 (cond
+                   (open-bracket item) (conj stack item)
+                   (and (open-bracket (peek stack))
+                        (= (close-bracket item) (peek stack))) (pop stack)
+                   :else (conj stack item)))
+       [])
+
+       empty?))
+
+;(balanced? "{[( information )]}")
+;(balanced? "[[[[}{]]]]")
+
 (defn -main
   "I don't do a whole lot."
   []
